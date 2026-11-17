@@ -1,0 +1,44 @@
+Задание
+
+Шаг 1. Опишите аннотацию:
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface TestId {
+    String value();   // номер тест-кейса, например "TC-101"
+    int order();      // порядок выполнения в прогоне
+}
+
+Шаг 2. Создайте класс Checklist с 4–5 методами.
+Пометьте их @TestId так, чтобы порядок объявления в классе и
+порядок в order не совпадали. Один метод оставьте без аннотации - для проверки,
+что он в план не попадёт:
+
+public class Checklist {
+    @TestId(value = "TC-103", order = 3)
+    void checkCommentAdded() { }
+
+    @TestId(value = "TC-101", order = 1)
+    void checkLogin() { }
+    // ... остальные методы
+}
+
+Шаг 3. Напишите сканер TestPlanScanner.buildPlan(Class<?> clazz):
+
+T1	Найти все методы с @TestId	через getDeclaredMethods() и isAnnotationPresent()
+T2	Собрать план	запись TestStep(String id, String methodName, int order) для
+каждого найденного метода
+T3	Отсортировать по order и вывести	номер кейса и имя метода в порядке прогона
+T4	Класс без аннотированных методов	не ошибка - печатается «Кейсов нет»
+
+План прогона для Checklist:
+  1. TC-101 → checkLogin
+  2. TC-102 → checkTaskCreated
+  3. TC-103 → checkCommentAdded
+  4. TC-104 → checkLogout
+
+Требования
+№	Требование
+1	У аннотации стоит @Retention(RUNTIME). В комментарии можете объяснить,
+что сломается, если поставить CLASS или SOURCE.
+2	Сканер не создаёт объект класса и не вызывает методы - он только читает метаданные.
